@@ -1,0 +1,154 @@
+function Plots
+close all
+a=[1 1 1];
+b=[1];
+ciy=[1 1];
+tam=size(a);
+tami=size(b);
+syms y(t) Y(s) x(t) X(s) Yy fp;
+syms edd edi 
+t0=10;
+edd=0;
+edi=0;
+edd2=0;
+edi2=0;
+edd3=0;
+edi3=0;
+edd4=0;
+edi4=0;
+edd5=0;
+edi5=0;
+xi=dirac(t);
+x2=0;
+x3=exp(-t)*heaviside(t);
+x4=exp(-t)*heaviside(t);
+x5=heaviside(t);
+for i=1:tam(2)
+   edd=edd+a(i)*s^(i-1)*Y(s);
+   edd2=edd2+a(i)*s^(i-1)*Y(s);
+   edd3=edd3+a(i)*s^(i-1)*Y(s);
+   edd4=edd4+a(i)*s^(i-1)*Y(s);
+   edd5=edd5+a(i)*s^(i-1)*Y(s);
+   for k=1:i-1
+       edd2=edd2-a(i)*(s^(i-1-k)*ciy(k));
+       edd4=edd4-a(i)*(s^(i-1-k)*ciy(k));
+   end
+end
+
+for i=1:tami(2)
+   edi=edi+b(i)*s^(i-1)*X(s);
+   edi2=edi2+b(i)*s^(i-1)*X(s);
+   edi3=edi3+b(i)*s^(i-1)*X(s);
+   edi4=edi4+b(i)*s^(i-1)*X(s);
+   edi5=edi5+b(i)*s^(i-1)*X(s);
+end
+
+edi=subs(edi,X(s), laplace(xi));
+edd=collect(edd,Y(s));
+edd=subs(edd,Y(s),Yy);
+eq1=edd==edi;
+edd=solve(eq1, Yy);
+%pretty(simplify(edd))
+%pretty(partfrac(edd))
+y(t)=ilaplace(edd);
+%pretty(y(t))
+
+edi2=subs(edi2,X(s),0);
+edd2=collect(edd2,Y(s));
+edd2=subs(edd2,Y(s),Yy);
+eq1=edd2==edi2;
+edd2=solve(eq1, Yy);
+%pretty(simplify(edd2))
+%pretty(partfrac(edd2))
+y2(t)=ilaplace(edd2);
+%pretty(y2(t))
+
+edi3=subs(edi3,X(s),laplace(x3));
+edd3=collect(edd3,Y(s));
+edd3=subs(edd3,Y(s),Yy);
+eq1=edd3==edi3;
+edd3=solve(eq1, Yy);
+%pretty(simplify(edd3))
+%pretty(partfrac(edd3))
+y3(t)=ilaplace(edd3);
+%pretty(y3(t))
+
+edi4=subs(edi4,X(s),laplace(x4));
+edd4=collect(edd4,Y(s));
+edd4=subs(edd4,Y(s),Yy);
+eq1=edd4==edi4;
+edd4=solve(eq1, Yy);
+%pretty(simplify(edd4))
+%pretty(partfrac(edd4))
+y4(t)=ilaplace(edd4);
+%pretty(y4(t))
+
+edi5=subs(edi5,X(s),laplace(x4));
+edd5=collect(edd5,Y(s));
+edd5=subs(edd5,Y(s),Yy);
+eq1=edd5==edi5;
+edd5=solve(eq1, Yy);
+%pretty(simplify(edd5))
+%pretty(partfrac(edd5))
+y5(t)=ilaplace(edd5);
+%pretty(y5(t))
+
+dy(t)=diff(y,t);
+ddy(t)=diff(dy,t);
+figure (1)
+hFig = figure(1);
+set(hFig, 'Position', [0 0 900 900])
+axes1 = axes('Parent',hFig,'FontWeight','bold','FontSize',16);
+tiempo=0:0.01:t0;
+
+subplot(3,3,1)
+fplot(xi,[0, t0],'b','LineWidth',2)
+hold on
+fplot(y,[0,t0],'r','LineWidth',2)
+legend('Entrada x(t)','Salida h(t)','Location','Best')
+xlabel('Tiempo','FontWeight','bold','FontSize',10)
+title('Entrada y Respuesta al impulso','FontWeight','bold','FontSize',8)
+grid on
+subplot(3,3,2)
+fplot(x2,[0, t0],'b','LineWidth',2)
+hold on
+fplot(y2,[0,t0],'r','LineWidth',2)
+legend('Entrada x(t)','Salida y(t)','Location','Best')
+xlabel('Tiempo','FontWeight','bold','FontSize',10)
+title('Entrada y Respuesta a entrada cero','FontWeight','bold','FontSize',8)
+grid on
+subplot(3,3,3)
+fplot(x3,[0, t0],'b','LineWidth',2)
+hold on
+fplot(y3,[0,t0],'r','LineWidth',2)
+legend('Entrada x(t)','Salida y(t)','Location','Best')
+xlabel('Tiempo','FontWeight','bold','FontSize',10)
+title('Entrada y Respuesta a estado cero','FontWeight','bold','FontSize',8)
+grid on
+subplot(3,3,4)
+fplot(x4,[0, t0],'b','LineWidth',2)
+hold on
+fplot(y4,[0,t0],'r','LineWidth',2)
+legend('Entrada x(t)','Salida y(t)','Location','Best')
+xlabel('Tiempo','FontWeight','bold','FontSize',10)
+title('Entrada y Respuesta total','FontWeight','bold','FontSize',8)
+grid on
+subplot(3,3,5)
+fplot(x5,[0, t0],'b','LineWidth',2)
+hold on
+fplot(y5,[0,t0],'r','LineWidth',2)
+legend('Entrada x(t)','Salida y(t)','Location','Best')
+xlabel('Tiempo','FontWeight','bold','FontSize',10)
+title('Entrada y Respuesta al escalon con CI=0','FontWeight','bold','FontSize',8)
+grid on
+%subplot(2,1,2)
+%fplot(dy,[0,t0],'g','LineWidth',2)
+
+%hold on
+%title('Primera y segunda derivada de la salida','FontWeight','bold','FontSize',16)
+%fplot(ddy,[0,t0],'m','LineWidth',2)
+
+%legend('dh(t)/dt','d^2h(t)/d^2t','Location','Best')
+%xlabel('tiempo','FontWeight','bold','FontSize',16)
+%grid on
+end
